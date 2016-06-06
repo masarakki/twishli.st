@@ -1,0 +1,9 @@
+twishlist:
+  task_definition: twishlist-app
+  desired_count: 1
+  role: ecsServiceRole
+  load_balancers:
+    -
+      name: EC2Contai-EcsElast-1ISCVDKSNIQLQ
+      container_name: twishlist-app
+      container_port: 80
