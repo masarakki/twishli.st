@@ -1,0 +1,23 @@
+$font-size-base: 2.0rem;
+$font-family-sans: Merriweather;
+$h1-font-size: $font-size-base * 4.0;
+
+@import '~bootstrap/scss/bootstrap';
+
+@import url(https://fonts.googleapis.com/css?family=Merriweather);
+
+.jumbotron,
+.lead {
+  background-color: transparent;
+  text-align: center;
+  font-family: Merriweather;
+}
+
+form {
+  margin: 0 10%;
+  text-align: center;
+
+  .form-group {
+    margin: 32px 0;
+  }
+}

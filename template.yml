@@ -1,0 +1,41 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Resources:
+  Twishlist:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: handler.twishlist
+      Runtime: nodejs6.10
+      Events:
+        Authenticate:
+          Type: Api
+          Properties:
+            Path: /_auth
+            Method: get
+        ShowUser:
+          Type: Api
+          Properties:
+            Path: /{screen_name}
+            Method: get
+        UpdateUser:
+          Type: Api
+          Properties:
+            Path: /_user
+            Method: post
+      Environment:
+        Variables:
+          TABLE_NAME: !Ref UsersTable
+          IDENTITY_POOL: !Ref IdentityPool
+  UsersTable:
+    Type: AWS::Serverless::SimpleTable
+    PrimaryKey:
+      Name: screen_name
+      Type: String
+  IdentityPool:
+    Type: AWS::Cognito::IdentityPool
+    Properties:
+      AllowUnauthenticatedIdentities: false
+  StaticBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: twishlist-static
