@@ -7,11 +7,26 @@ Resources:
       Handler: handler.twishlist
       Runtime: nodejs6.10
       Events:
+        Top:
+          Type: Api
+          Properties:
+            Path: /
+            Method: get
         Authenticate:
           Type: Api
           Properties:
             Path: /_auth
             Method: get
+        Verify:
+          Type: Api
+          Properties:
+            Path: /_verify
+            Method: post
+        Register:
+          Type: Api
+          Properties:
+            Path: /_register
+            Method: post
         ShowUser:
           Type: Api
           Properties:
@@ -34,7 +49,60 @@ Resources:
   IdentityPool:
     Type: AWS::Cognito::IdentityPool
     Properties:
-      AllowUnauthenticatedIdentities: false
+      AllowUnauthenticatedIdentities: true
+  AuthenticatedPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+        - Effect: Allow
+          Action:
+          - mobileanalytics:PutEvents
+          - cognito-sync:*
+          - cognito-identity:*
+          Resource:
+          - "*"
+  AuthenticatedRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Action:
+              - sts:AssumeRoleWithWebIdentity
+            Principal:
+              Federated:
+                - cognito-identity.amazonaws.com
+                - api.twitter.com
+      ManagedPolicyArns:
+        - !Ref AuthenticatedPolicy
+  UnauthenticatedRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Action:
+              - sts:AssumeRoleWithWebIdentity
+            Principal:
+              Federated:
+                - cognito-identity.amazonaws.com
+  RoleAttachment:
+    Type: AWS::Cognito::IdentityPoolRoleAttachment
+    Properties:
+      IdentityPoolId: !Ref IdentityPool
+      Roles:
+        authenticated:
+          Fn::GetAtt:
+            - AuthenticatedRole
+            - Arn
+        unauthenticated:
+          Fn::GetAtt:
+            - UnauthenticatedRole
+            - Arn
   StaticBucket:
     Type: AWS::S3::Bucket
     Properties:

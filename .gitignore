@@ -18,6 +18,7 @@
 /tmp
 !/tmp/.keep
 /node_modules/
-/dist/
+/dev
+/prod
 /*.log
 /.env.*

@@ -1,7 +1,11 @@
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const Dotenv = require('dotenv-webpack');
 
-const outputPath = path.resolve(__dirname, 'dist');
+const devPath = path.resolve(__dirname, 'dev');
+const prodPath = path.resolve(__dirname, 'prod');
+
+const prod = process.env.NODE_ENV === 'production';
 
 module.exports = {
   entry: [
@@ -9,7 +13,7 @@ module.exports = {
     './src/css/main.scss'
   ],
   output: {
-    path: outputPath,
+    path: prod ? prodPath : devPath,
     filename: '[name].js'
 
   },
@@ -18,8 +22,7 @@ module.exports = {
       test: /\.(scss|sass|css)$/i,
       use: [
         { loader: 'style-loader' },
-        { loader: 'css-loader', options: { minimize: process.env.NODE_ENV === 'production' } },
-//        { loader: 'postcss-loader', options: { sourceMap: true } },
+        { loader: 'css-loader', options: { minimize: prod } },
         { loader: 'sass-loader' }
       ]
     }]
@@ -27,10 +30,13 @@ module.exports = {
   plugins: [
     new HtmlWebpackPlugin({
       template: 'src/html/index.html'
-    })
+    }),
+    new Dotenv({
+      path: prod ? '.env.prod' : '.env.dev',
+    }),
   ],
   devtool: 'inline-source-map',
   devServer: {
-    contentBase: outputPath
+    contentBase: devPath
   }
 };
